@@ -13,7 +13,7 @@ type MapControlsImpl = any
 import * as THREE from 'three'
 import type { Post } from '@/types'
 import { CrumpledPaper3D } from './CrumpledPaper3D'
-import { dbToWorld, WORLD_W, WORLD_H, ZOOM_FAR, ZOOM_MED } from '@/lib/paper/worldCoordinates'
+import { dbToWorld, worldToDb, WORLD_W, WORLD_H, ZOOM_FAR, ZOOM_MED } from '@/lib/paper/worldCoordinates'
 import { BOARD_CONFIG } from '@/lib/paper/boardConfig'
 
 // ─── Zoom context ─────────────────────────────────────────────────────────────
@@ -188,15 +188,19 @@ interface SceneProps {
   zoom: number
   setZoom: (z: number) => void
   onPaperClick: (post: Post) => void
+  onPaperMoved: (postId: string, xDb: number, yDb: number) => void
   controlsRef: React.RefObject<MapControlsImpl | null>
 }
 
-function Scene({ posts, newPostId, myPostIds, zoom, setZoom, onPaperClick, controlsRef }: SceneProps) {
+function Scene({ posts, newPostId, myPostIds, zoom, setZoom, onPaperClick, onPaperMoved, controlsRef }: SceneProps) {
   const { camera } = useThree()
   const raycaster    = useRef(new THREE.Raycaster())
   const dragTarget   = useRef<{ id: string; x: number; z: number } | null>(null)
   const grabbedRbRef = useRef<RBRef | null>(null)
   const grabOnEnd    = useRef<(() => void) | null>(null)
+  // Keep callback in ref so the effect closure is always fresh without re-running
+  const onPaperMovedRef = useRef(onPaperMoved)
+  onPaperMovedRef.current = onPaperMoved
 
   const beginGrab = useCallback((
     id: string, rbRef: RBRef, wx: number, wz: number, onEnd: () => void,
@@ -225,12 +229,19 @@ function Scene({ posts, newPostId, myPostIds, zoom, setZoom, onPaperClick, contr
 
     const onUp = () => {
       if (!dragTarget.current) return
+      // Snapshot final world position before clearing
+      const { id, x: wx, z: wz } = dragTarget.current
+      const [xDb, yDb] = worldToDb(wx, wz)
+
       grabOnEnd.current?.()
       grabOnEnd.current    = null
       grabbedRbRef.current = null
       dragTarget.current   = null
       if (controlsRef.current) controlsRef.current.enabled = true
       document.body.style.cursor = 'default'
+
+      // Persist new position to DB
+      onPaperMovedRef.current(id, Math.round(xDb), Math.round(yDb))
     }
 
     window.addEventListener('pointermove', onMove)
@@ -325,11 +336,12 @@ interface Props {
   newPostId: string | null
   myPostIds: Set<string>
   onPaperClick: (post: Post) => void
+  onPaperMoved: (postId: string, xDb: number, yDb: number) => void
   zoom: number
   onZoomChange: (z: number) => void
 }
 
-export default function PaperCanvas3D({ posts, newPostId, myPostIds, onPaperClick, zoom, onZoomChange }: Props) {
+export default function PaperCanvas3D({ posts, newPostId, myPostIds, onPaperClick, onPaperMoved, zoom, onZoomChange }: Props) {
   const controlsRef = useRef<MapControlsImpl | null>(null)
 
   return (
@@ -356,6 +368,7 @@ export default function PaperCanvas3D({ posts, newPostId, myPostIds, onPaperClic
                 zoom={zoom}
                 setZoom={onZoomChange}
                 onPaperClick={onPaperClick}
+                onPaperMoved={onPaperMoved}
                 controlsRef={controlsRef}
               />
             </Suspense>

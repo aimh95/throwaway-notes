@@ -51,6 +51,19 @@ export default function PaperBoardPage() {
     return () => { cancelled = true }
   }, [])
 
+  const handlePaperMoved = useCallback(async (postId: string, xDb: number, yDb: number) => {
+    // Optimistically update local state so the position is correct without reload
+    setPosts((prev) =>
+      prev.map((p) => p.id === postId ? { ...p, x_position: xDb, y_position: yDb } : p)
+    )
+    // Persist to Supabase
+    const { error } = await supabase
+      .from('posts')
+      .update({ x_position: xDb, y_position: yDb })
+      .eq('id', postId)
+    if (error) console.error('[position save error]', error)
+  }, [])
+
   const handleCreated = useCallback((post: Post) => {
     setPosts((prev) => [post, ...prev])
     setNewPostId(post.id)
@@ -80,6 +93,7 @@ export default function PaperBoardPage() {
         zoom={zoom}
         onZoomChange={setZoom}
         onPaperClick={(post) => { setSelectedPost(post); setShowCreate(false) }}
+        onPaperMoved={handlePaperMoved}
       />
 
       {/* Right sidebar: accumulation progress */}
