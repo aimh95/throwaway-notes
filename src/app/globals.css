@@ -1,9 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Nanum+Myeongjo:wght@400;700&display=swap');
 @import "tailwindcss";
 
 :root {
   --bg-warm: #F7EFE5;
   --text-warm: #3F342B;
   --accent: #B9855B;
+  --font-serif: 'Cormorant Garamond', 'Nanum Myeongjo', Georgia, 'Times New Roman', serif;
 }
 
 * {

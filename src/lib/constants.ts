@@ -1,6 +1,7 @@
-import type { PaperColor, CrumpleStyle } from '@/types'
+import type { CrumpleStyle } from '@/types'
 
-export const PAPER_COLORS: Record<PaperColor, { bg: string; label: string }> = {
+// Named preset colors — hex values used as fallback UI backgrounds
+export const PAPER_COLORS: Record<string, { bg: string; label: string }> = {
   ivory:          { bg: '#FEFCE8', label: 'Ivory' },
   'pale-peach':   { bg: '#FFF0E4', label: 'Peach' },
   'muted-yellow': { bg: '#FEFBD0', label: 'Yellow' },
@@ -10,13 +11,14 @@ export const PAPER_COLORS: Record<PaperColor, { bg: string; label: string }> = {
 }
 
 export const CRUMPLE_STYLES: Record<CrumpleStyle, { label: string }> = {
-  ball:  { label: '구겨진 공' },
-  flat:  { label: '납작하게' },
-  crane: { label: '학' },
-  boat:  { label: '배' },
+  ball:     { label: '구겨진 공' },
+  flat:     { label: '구겨진 종이' },
+  crane:    { label: '학' },
+  boat:     { label: '배' },
+  airplane: { label: '비행기' },
 }
 
-export const PAPER_COLOR_OPTIONS = Object.keys(PAPER_COLORS) as PaperColor[]
+export const PAPER_COLOR_OPTIONS = Object.keys(PAPER_COLORS)
 export const CRUMPLE_STYLE_OPTIONS = Object.keys(CRUMPLE_STYLES) as CrumpleStyle[]
 
 export const MAX_TITLE_LENGTH = 80

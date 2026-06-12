@@ -2,7 +2,6 @@ import type { PaperColor, CreatePostInput, CreateCommentInput } from '@/types'
 import {
   PAPER_COLORS,
   CANVAS_VIRTUAL_WIDTH,
-  CANVAS_VIRTUAL_HEIGHT,
   PAPER_WIDTH,
   MAX_CONTENT_LENGTH,
   MAX_TITLE_LENGTH,
@@ -11,6 +10,9 @@ import {
 } from './constants'
 
 export function getPaperColorToken(color: PaperColor): string {
+  // Direct hex color
+  if (color.startsWith('#')) return color
+  // Named preset
   return PAPER_COLORS[color]?.bg ?? '#FEFCE8'
 }
 
@@ -18,7 +20,7 @@ export function generatePaperPosition(): { x: number; y: number } {
   const margin = PAPER_WIDTH
   return {
     x: margin + Math.random() * (CANVAS_VIRTUAL_WIDTH - margin * 2),
-    y: margin + Math.random() * (CANVAS_VIRTUAL_HEIGHT - margin * 2),
+    y: margin + Math.random() * (1400 - margin * 2),
   }
 }
 

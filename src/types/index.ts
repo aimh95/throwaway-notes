@@ -1,12 +1,7 @@
-export type CrumpleStyle = 'ball' | 'flat' | 'crane' | 'boat'
+export type CrumpleStyle = 'ball' | 'flat' | 'crane' | 'boat' | 'airplane'
 
-export type PaperColor =
-  | 'ivory'
-  | 'pale-peach'
-  | 'muted-yellow'
-  | 'dusty-pink'
-  | 'light-sage'
-  | 'warm-gray'
+// Named presets OR arbitrary hex string like '#FF5733'
+export type PaperColor = string
 
 export interface Post {
   id: string
